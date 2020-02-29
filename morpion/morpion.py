@@ -78,7 +78,6 @@ class Morpion_board():
                 elif (self.current_board[2, 0] == 'X' and self.current_board[2, 1] == 'X' and self.current_board[
                     2, 2] == 'X'):
                     return True
-        return False
 
     def actions(self):  # returns all possible moves
         acts = []

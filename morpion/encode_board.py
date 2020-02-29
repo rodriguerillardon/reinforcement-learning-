@@ -10,7 +10,7 @@ def encode_board(board):
             if board_sate[row,col] != ' ':
                 encoded[row, col, encoder_dict[board_sate[row, col]]] = 1
     if board.player == 1:
-        encoded[::2] = 1
+        encoded[:,:,2] = 1
     return encoded
 
 def decode_board(encoded):
@@ -32,10 +32,11 @@ if __name__ == '__main__':
     M = Morpion_board()
     M.draw_sign(1,1)
     M.draw_sign(2,2)
+    M.draw_sign(0,1)
 
     l = encode_board(M)
     m = decode_board(l)
     print(M)
-    print(m.player)
+    #print(m.player)
     print(m)
-    print(l)
+    print(l[:,:,0])
