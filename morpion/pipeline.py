@@ -19,14 +19,13 @@ if __name__ == "__main__":
                         help="Temperature for first 10 moves of each MCTS self-play")
     parser.add_argument("--num_evaluator_games", type=int, default=100,
                         help="No of games to play to evaluate neural nets")
-    parser.add_argument("--neural_net_name", type=str, default="cc4_current_net_", help="Name of neural net")
+    parser.add_argument("--neural_net_name", type=str, default="tictactoe", help="Name of neural net")
     parser.add_argument("--batch_size", type=int, default=32, help="Training batch size")
     parser.add_argument("--num_epochs", type=int, default=300, help="No of epochs")
     parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
     parser.add_argument("--gradient_acc_steps", type=int, default=1, help="Number of steps of gradient accumulation")
     parser.add_argument("--max_norm", type=float, default=1.0, help="Clipped gradient norm")
     args = parser.parse_args()
-
     logger.info('Starting iteration pipeline...')
     for i in range(args.iteration, args.total_iterations):
         run_MCTS(args, start_idx=0, iteration=i)

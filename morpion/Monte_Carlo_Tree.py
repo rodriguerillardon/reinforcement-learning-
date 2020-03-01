@@ -128,7 +128,7 @@ def UCT_search(game_state, num_reads, net, temp):
     for i in range(num_reads):
         leaf = root.select_leaf()
         encoded_s = ed.encode_board(leaf.game); encoded_s = encoded_s.transpose(2,0,1)
-        encoded_s = torch.from_numpy(encoded_s).float().cuda()
+        encoded_s = torch.from_numpy(encoded_s).float()
         child_priors, value_estimate = net(encoded_s)
         child_priors = child_priors.detach().cpu().numpy().reshape(-1); value_estimate = value_estimate.item()
         if leaf.game.check_winner() == True or leaf.game.actions()==[]:
@@ -195,7 +195,7 @@ def MCTS_self_play(connectnet, num_games, start_idx, cpu, args, iteration):
 
 
 def run_MCTS(args, start_idx=0, iteration=0):
-    net_to_play = "%s_iter%d.pth.tar" % (args.neural_net_game, iteration)
+    net_to_play = f"{args.neural_net_name}_iter{iteration}.pth.tar"
     net = ConnectNet()
     cuda = torch.cuda.is_available()
     if cuda:

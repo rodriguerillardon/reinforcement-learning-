@@ -1,12 +1,14 @@
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset
+from logzero import logger
 
 import matplotlib
 matplotlib.use("Agg")
 
 class board_data(Dataset):
     def __init__(self, dataset):  # dataset = np.array of (s, p, v)
+        logger.info(dataset)
         self.X = dataset[:, 0]
         self.y_p, self.y_v = dataset[:, 1], dataset[:, 2]
 
@@ -33,7 +35,7 @@ class ResBlock(nn.Module):
         super(ResBlock, self).__init__()
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, biais=False)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
 
     def forward(self, x):
