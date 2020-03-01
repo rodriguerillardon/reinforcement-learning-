@@ -23,7 +23,7 @@ def decode_board(encoded):
                 if encoded[row,col,k] == 1:
                     decoded[row,col] = decoder_dict[k]
     cboard = Morpion_board()
-    cboard.current_board = decoded
+    cboard.board = decoded
     cboard.player = encoded[0,0,2]
     return cboard
 
