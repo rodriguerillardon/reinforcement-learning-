@@ -60,7 +60,7 @@ class OutBlock(nn.Module):
         self.conv1 = nn.Conv2d(128, 32, kernel_size=1)
         self.bn1 = nn.BatchNorm2d(32)
         self.logsoftmax = nn.LogSoftmax(dim=1)
-        self.fc = nn.Linear(3*3*32, 3)
+        self.fc = nn.Linear(3*3*32, 9)
 
     def forward(self, s):
         v = self.conv(s)
@@ -92,6 +92,7 @@ class ConnectNet(nn.Module):
         s = self.conv(s)
         for block in range(19):
             s = getattr(self, 'res%i' % block)(s)
+
         s = self.outblock(s)
         return s
 

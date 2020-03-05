@@ -28,7 +28,7 @@ def decode_board(encoded):
     return cboard
 
 
-if __name__ == '__main__':
+"""if __name__ == '__main__':
     M = Morpion_board()
     M.draw_sign(1,1)
     M.draw_sign(2,2)
@@ -40,3 +40,4 @@ if __name__ == '__main__':
     #print(m.player)
     print(m)
     print(l[:,:,0])
+"""

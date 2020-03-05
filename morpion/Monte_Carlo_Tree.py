@@ -35,9 +35,9 @@ class UCT_node():
         self.is_expanded = False
         self.parent = parent
         self.children = {}
-        self.child_priors = np.zeros([3], dtype=np.float32)
-        self.child_total_value = np.zeros([3], dtype=np.float32)
-        self.child_number_visits = np.zeros([3], dtype=np.float32)
+        self.child_priors = np.zeros([9], dtype=np.float32)
+        self.child_total_value = np.zeros([9], dtype=np.float32)
+        self.child_number_visits = np.zeros([9], dtype=np.float32)
         self.action_index = []
         
     @property
@@ -60,12 +60,18 @@ class UCT_node():
         return self.child_total_value / (1 + self.child_number_visits)
 
     def child_U(self):
-        return math.sqrt(self.number_visits) * (abs(self.child_priors)) / (1 + self.child_number_visits)
+        if type(self.number_visits) is float:
+            return math.sqrt(self.number_visits) * (abs(self.child_priors)) / (1 + self.child_number_visits)
+        elif type(self.number_visits) is np.ndarray:
+            return math.sqrt(self.number_visits[-1]) * (abs(self.child_priors)) / (1 + self.child_number_visits)
+
+
 
     def best_child(self):
         if self.action_index != []:
             best_move = self.child_Q() + self.child_U()
-            best_move = self.action_index[np.argmax(best_move[self.action_index])]
+            best_move.resize(3,3)
+            best_move = self.action_index[np.argmax([best_move[i,j] for i,j in self.action_index])]
         else :
             best_move = np.argmax(self.child_Q() + self.child_U())
         return best_move
@@ -77,10 +83,17 @@ class UCT_node():
             current = current.maybe_add_child(best_move)
         return current
 
-    def add_dirichlet_noise(selfself, action_idxs, child_priors):
-        valid_child_priors = child_priors[action_idxs]
-        valid_child_priors = 0.75 * valid_child_priors + 0.25*np.random.dirichlet(np.zeros([len(valid_child_priors)], dtype=np.float32)+192)
-        child_priors[action_idxs] = valid_child_priors
+    def add_dirichlet_noise(self, action_idxs, child_priors):
+
+        child_priors.resize(3,3)
+        valid_child_priors = [child_priors[i,j] for i,j in action_idxs]
+        valid_child_priors = 0.75 * np.array(valid_child_priors) + 0.25*np.random.dirichlet(np.zeros([len(valid_child_priors) ], dtype=np.float32)+192)
+        valid_child_priors.resize(3,3)
+        for i,j in action_idxs:
+            child_priors[i,j] = valid_child_priors[i,j]
+
+        #child_priors[action_idxs] = valid_child_priors
+        child_priors.resize(1,9)
         return child_priors
 
     def expand(self, child_priors):
@@ -99,11 +112,12 @@ class UCT_node():
         return board
 
     def maybe_add_child(self, move):
-        if move not in self.children:
+
+        if tuple(move) not in self.children:
             copy_board = copy.deepcopy(self.game)
             copy_board = self.decode_n_move_pieces(copy_board, move)
-            self.children[move] = UCT_node(copy_board, move, parent=self)
-        return self.children[move]
+            self.children[tuple(move)] = UCT_node(copy_board, move, parent=self)
+        return self.children[tuple(move)]
 
     def backup(self, value_estimate: float):
         current = self
@@ -172,7 +186,8 @@ def MCTS_self_play(connectnet, num_games, start_idx, cpu, args, iteration):
             board_state = copy.deepcopy(ed.encode_board(current_board))
             root = UCT_search(current_board, 50, connectnet, t)
             policy = get_policy(root, t); print("[CPU: %d]: Game %d POLICY:\n " % (cpu, idxx), policy)
-            current_board = do_decode_n_move_pieces(current_board, np.random.choice(np.array([0,1,2,3,4,5,6]), p = policy))
+            actions = [[0,0],[0,1], [0,2], [1,0], [1,1], [1,2], [2,0], [2,1], [2,2]]
+            current_board = do_decode_n_move_pieces(current_board, actions[np.random.choice(np.array([0,1,2,3,4,5,6,7,8]), p = policy)])
             dataset.append([board_state, policy])
             print("[Iteration: %d CPU: %d]: Game %d CURRENT BOARD:\n" % (iteration, cpu, idxx), current_board.current_board,current_board.player); print(" ")
             if current_board.check_winner() == True:
@@ -212,6 +227,7 @@ def run_MCTS(args, start_idx=0, iteration=0):
         if os.path.isfile(current_net_filename):
             checkpoint = torch.load(current_net_filename)
             net.load_state_dict(checkpoint['state_dict'])
+
             logger.info('Loaded %s model.' % current_net_filename)
         else:
             torch.save({'state_dict': net.state_dict()}, os.path.join("./model_data", net_to_play))

@@ -7,7 +7,8 @@ class Morpion_board():
         self.player = 0
         self.current_board = self.board
 
-    def draw_sign(self, row, column):
+    def draw_sign(self, move):
+        row, column = move[0], move[1]
         if self.current_board[row, column] != ' ':
             return ('Invalid position')
         else:
@@ -90,7 +91,7 @@ class Morpion_board():
     def __repr__(self):
         return(f"""{self.board}""")
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     M = Morpion_board()
     M.draw_sign(1,1)
     M.draw_sign(2,2)
@@ -99,5 +100,5 @@ if __name__ == "__main__":
     M.draw_sign(0, 1)
     print(M)
     print(M.actions())
-    print(M.check_winner())
+    print(M.check_winner())"""
 
