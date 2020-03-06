@@ -1,1 +1,4 @@
 logzero
+numpy
+torch
+-e git://github.com/Axeldnahcram/python-connect4.git
