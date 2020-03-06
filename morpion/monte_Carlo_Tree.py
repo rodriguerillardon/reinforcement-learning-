@@ -164,12 +164,8 @@ def do_decode_n_move_pieces(board,move):
     return board
 
 def get_policy(root, temp=1):
-    policy = np.zeros([9], dtype=np.float32)
-    #policy = policy/sum(policy)
-    for idx in np.where(root.child_number_visits!=0)[0]:
-        policy[idx] = ((root.child_number_visits[idx])**(1/temp))/sum(root.child_number_visits**(1/temp))
+    return ((root.child_number_visits) ** (1 / temp)) / sum(root.child_number_visits ** (1 / temp))
 
-    return policy
 
 def MCTS_self_play(connectnet, num_games, start_idx, cpu, args, iteration):
     logger.info("[CPU: %d]: Starting MCTS self-play..." % cpu)
@@ -191,19 +187,19 @@ def MCTS_self_play(connectnet, num_games, start_idx, cpu, args, iteration):
                 t = args.temperature_MCTS
             else:
                 t = 0.1
-            states.append(copy.deepcopy(current_board.current_board))
+            states.append(copy.deepcopy(current_board.board))
             board_state = copy.deepcopy(ed.encode_board(current_board))
-            root = UCT_search(current_board, 4, connectnet, t)
+            root = UCT_search(current_board, 50, connectnet, t)
             policy = get_policy(root, t); print("[CPU: %d]: Game %d POLICY:\n " % (cpu, idxx), policy)
             actions = [[0,0],[0,1], [0,2], [1,0], [1,1], [1,2], [2,0], [2,1], [2,2]]
             current_board = do_decode_n_move_pieces(current_board, actions[np.random.choice(np.array([0,1,2,3,4,5,6,7,8]), p = policy)])
             dataset.append([board_state, policy])
-            print("[Iteration: %d CPU: %d]: Game %d CURRENT BOARD:\n" % (iteration, cpu, idxx), current_board.current_board,current_board.player); print(" ")
+            print("[Iteration: %d CPU: %d]: Game %d CURRENT BOARD:\n" % (iteration, cpu, idxx), current_board.board,current_board.player); print(" ")
             if current_board.check_winner() == True:
                 if current_board.player == 0:
                     value = -1
                 elif current_board.player == 1:
-                    balue = 1
+                    value = 1
                 checkmate = True
             move_count += 1
         dataset_p = []

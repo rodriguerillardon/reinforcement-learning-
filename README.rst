@@ -46,4 +46,4 @@ L'utilisateur est libre de jouer contre l'IA en executant le fichier play_agains
 Rapport
 -------
 
-Un léger rapport sur notre travail est disponible dans le `fichier reinforcement_learning_master.pdf`. 
+Un léger rapport sur notre travail est disponible dans le `fichier reinforcement_learning_master.pdf`.
