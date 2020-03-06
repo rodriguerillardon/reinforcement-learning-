@@ -8,7 +8,11 @@ class Morpion_board():
         self.current_board = self.board
 
     def draw_sign(self, move):
-        row, column = move[0], move[1]
+        if hasattr(move, "__len__"):
+            row, column = move[0], move[1]
+        else:
+            row = move//3
+            column = move%3
         if self.current_board[row, column] != ' ':
             return ('Invalid position')
         else:
@@ -79,6 +83,7 @@ class Morpion_board():
                 elif (self.current_board[2, 0] == 'X' and self.current_board[2, 1] == 'X' and self.current_board[
                     2, 2] == 'X'):
                     return True
+        return False
 
     def actions(self):  # returns all possible moves
         acts = []
@@ -91,14 +96,10 @@ class Morpion_board():
     def __repr__(self):
         return(f"""{self.board}""")
 
-"""if __name__ == "__main__":
+if __name__ == "__main__":
     M = Morpion_board()
-    M.draw_sign(1,1)
-    M.draw_sign(2,2)
-    M.draw_sign(2, 1)
-    M.draw_sign(0, 0)
-    M.draw_sign(0, 1)
+    M.draw_sign([1,1])
     print(M)
     print(M.actions())
-    print(M.check_winner())"""
+    print(M.check_winner())
 

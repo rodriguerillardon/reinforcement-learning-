@@ -1,4 +1,4 @@
-from Monte_Carlo_Tree import run_MCTS
+from monte_Carlo_Tree import run_MCTS
 from train import train_connectnet
 from evaluator import evaluate_nets
 from argparse import ArgumentParser
@@ -11,17 +11,17 @@ logger = logging.getLogger(__file__)
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--iteration", type=int, default=0, help="Current iteration number to resume from")
-    parser.add_argument("--total_iterations", type=int, default=1000, help="Total number of iterations to run")
+    parser.add_argument("--total_iterations", type=int, default=5, help="Total number of iterations to run")
     parser.add_argument("--MCTS_num_processes", type=int, default=5, help="Number of processes to run MCTS self-plays")
-    parser.add_argument("--num_games_per_MCTS_process", type=int, default=120,
+    parser.add_argument("--num_games_per_MCTS_process", type=int, default=5,
                         help="Number of games to simulate per MCTS self-play process")
     parser.add_argument("--temperature_MCTS", type=float, default=1.1,
                         help="Temperature for first 10 moves of each MCTS self-play")
-    parser.add_argument("--num_evaluator_games", type=int, default=100,
+    parser.add_argument("--num_evaluator_games", type=int, default=3,
                         help="No of games to play to evaluate neural nets")
     parser.add_argument("--neural_net_name", type=str, default="tictactoe", help="Name of neural net")
     parser.add_argument("--batch_size", type=int, default=32, help="Training batch size")
-    parser.add_argument("--num_epochs", type=int, default=300, help="No of epochs")
+    parser.add_argument("--num_epochs", type=int, default=30, help="No of epochs")
     parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
     parser.add_argument("--gradient_acc_steps", type=int, default=1, help="Number of steps of gradient accumulation")
     parser.add_argument("--max_norm", type=float, default=1.0, help="Clipped gradient norm")

@@ -45,7 +45,7 @@ def load_state(net, optimizer, scheduler, args, iteration, new_optim_state=True)
 
 def load_results(iteration):
     losses_path = "./model_data/losses_per_epoch_iter%d.pkl" % iteration
-    if os.path_isfile(losses_path):
+    if os.path.exists(losses_path):
         losses_per_epoch = load_pickle("losses_per_epoch_iter%d.pkl" % iteration)
         logger.info("Loaded results buffer")
     else:
@@ -109,7 +109,7 @@ def train(net, dataset, optimizer, scheduler, start_epoch, cpu, args, iteration)
                 'state_dict': net.state_dict(),
                 'optimizer' : optimizer.state_dict(),
                 'scheduler' : scheduler.state_dict()
-            }, os.path.join('./model_data/', "s_iter%d.pth.tar" % (args.neural_net_name, (iteration+1))))
+            }, os.path.join(f'./model_data/',f"{args.neural_net_name}_iter{(iteration+1)}.pth.tar"))
 
     logger.info('Finished Training!')
     fig = plt.figure()

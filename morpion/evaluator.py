@@ -5,7 +5,7 @@ from neural_net import ConnectNet
 from morpion import Morpion_board as cboard
 import encode_board as ed
 import copy
-from Monte_Carlo_Tree import UCT_search, do_decode_n_move_pieces, get_policy
+from monte_Carlo_Tree import UCT_search, do_decode_n_move_pieces, get_policy
 import pickle
 import torch.multiprocessing as mp
 import datetime

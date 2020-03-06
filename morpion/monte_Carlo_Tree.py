@@ -60,21 +60,19 @@ class UCT_node():
         return self.child_total_value / (1 + self.child_number_visits)
 
     def child_U(self):
-        if type(self.number_visits) is float:
-            return math.sqrt(self.number_visits) * (abs(self.child_priors)) / (1 + self.child_number_visits)
-        elif type(self.number_visits) is np.ndarray:
-            return math.sqrt(self.number_visits[-1]) * (abs(self.child_priors)) / (1 + self.child_number_visits)
-
+        return math.sqrt(self.number_visits) * (
+                abs(self.child_priors) / (1 + self.child_number_visits))
 
 
     def best_child(self):
         if self.action_index != []:
-            best_move = self.child_Q() + self.child_U()
-            best_move.resize(3,3)
-            best_move = self.action_index[np.argmax([best_move[i,j] for i,j in self.action_index])]
-        else :
-            best_move = np.argmax(self.child_Q() + self.child_U())
-        return best_move
+            new_index = [3*i + j for i,j in self.action_index]
+            bestmove = self.child_Q() + self.child_U()
+            bestmove = np.argmax(bestmove[new_index])
+            #print(bestmove)
+        else:
+            bestmove = np.argmax(self.child_Q() + self.child_U())
+        return bestmove
 
     def select_leaf(self):
         current = self
@@ -83,17 +81,20 @@ class UCT_node():
             current = current.maybe_add_child(best_move)
         return current
 
-    def add_dirichlet_noise(self, action_idxs, child_priors):
-
-        child_priors.resize(3,3)
-        valid_child_priors = [child_priors[i,j] for i,j in action_idxs]
-        valid_child_priors = 0.75 * np.array(valid_child_priors) + 0.25*np.random.dirichlet(np.zeros([len(valid_child_priors) ], dtype=np.float32)+192)
-        valid_child_priors.resize(3,3)
+    @staticmethod
+    def get_indices_from_action(action_idxs):
+        list_indices = []
         for i,j in action_idxs:
-            child_priors[i,j] = valid_child_priors[i,j]
+            list_indices.append(i*3+j)
+        return list_indices
 
-        #child_priors[action_idxs] = valid_child_priors
-        child_priors.resize(1,9)
+    def add_dirichlet_noise(self, action_idxs, child_priors):
+        list_indices = self.get_indices_from_action(action_idxs)
+        print(list_indices)
+        valid_child_priors = child_priors[list_indices]
+        valid_child_priors = 0.75 * np.array(valid_child_priors) + 0.25*np.random.dirichlet(np.zeros([len(valid_child_priors) ], dtype=np.float32)+192)
+        child_priors[list_indices] = valid_child_priors
+
         return child_priors
 
     def expand(self, child_priors):
@@ -113,11 +114,12 @@ class UCT_node():
 
     def maybe_add_child(self, move):
 
-        if tuple(move) not in self.children:
+        if move not in self.children:
             copy_board = copy.deepcopy(self.game)
             copy_board = self.decode_n_move_pieces(copy_board, move)
-            self.children[tuple(move)] = UCT_node(copy_board, move, parent=self)
-        return self.children[tuple(move)]
+            self.children[move] = UCT_node(copy_board, move, parent=self)
+
+        return self.children[move]
 
     def backup(self, value_estimate: float):
         current = self
@@ -149,18 +151,27 @@ def UCT_search(game_state, num_reads, net, temp):
             leaf.backup(value_estimate); continue
         leaf.expand(child_priors)
         leaf.backup(value_estimate)
+
     return root
 
 def do_decode_n_move_pieces(board,move):
-    board.draw_sign(move)
+    if type(move)==int:
+        row = move//3
+        col = move%3
+        board.draw_sign([row, col])
+    else:
+        board.draw_sign(move)
     return board
 
 def get_policy(root, temp=1):
-    #policy = np.zeros([3], dtype=np.float32)
-    #for idx in np.where(root.child_number_visits!=0)[0]:
-        #policy[idx] = ((root.child_number_visits[idx])**(1/temp))/sum(root.child_number_visits**(1/temp))
+    policy = np.zeros([9], dtype=np.float32)
+    #policy = policy/sum(policy)
+    logger.info("BABABA")
+    logger.info(root.child_number_visits)
+    for idx in np.where(root.child_number_visits!=0)[0]:
+        policy[idx] = ((root.child_number_visits[idx])**(1/temp))/sum(root.child_number_visits**(1/temp))
 
-    return ((root.child_number_visits)**(1/temp))/sum(root.child_number_visits**(1/temp))
+    return policy
 
 def MCTS_self_play(connectnet, num_games, start_idx, cpu, args, iteration):
     logger.info("[CPU: %d]: Starting MCTS self-play..." % cpu)

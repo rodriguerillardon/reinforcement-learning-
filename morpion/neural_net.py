@@ -1,7 +1,9 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset
 from logzero import logger
+import numpy as np
 
 import matplotlib
 matplotlib.use("Agg")
