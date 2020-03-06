@@ -36,7 +36,8 @@ Entrainement
 Du fait des temps d'entrainements trop longs pour le puissance 4, nous avons donc décidé de tester les résultats obtenus sur
 Alpha Chess Zero sur un jeu beaucoup plus simple, le morpion.
 
-L'utilisateur du repo peut entrainer le modèle à l'aide des fichiers pipeline en les executant comme commande.
+L'utilisateur du repo peut entrainer le modèle à l'aide des fichiers pipeline en les executant comme commande. Il est possible de tuner les paramètres du système.
+Notemment le nombre d'époque, la quantité de jeu simultanés, et le batchsize
 
 Test
 ------
