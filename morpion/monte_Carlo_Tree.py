@@ -66,6 +66,9 @@ class UCT_node():
 
     def best_child(self):
         if self.action_index != []:
+            logger.info(self.child_U())
+            logger.info(self.child_Q())
+
             new_index = [3*i + j for i,j in self.action_index]
             bestmove = self.child_Q() + self.child_U()
             bestmove = np.argmax(bestmove[new_index])
@@ -90,11 +93,9 @@ class UCT_node():
 
     def add_dirichlet_noise(self, action_idxs, child_priors):
         list_indices = self.get_indices_from_action(action_idxs)
-        print(list_indices)
         valid_child_priors = child_priors[list_indices]
         valid_child_priors = 0.75 * np.array(valid_child_priors) + 0.25*np.random.dirichlet(np.zeros([len(valid_child_priors) ], dtype=np.float32)+192)
         child_priors[list_indices] = valid_child_priors
-
         return child_priors
 
     def expand(self, child_priors):
@@ -164,8 +165,8 @@ def do_decode_n_move_pieces(board,move):
     return board
 
 def get_policy(root, temp=1):
-    return ((root.child_number_visits) ** (1 / temp)) / sum(root.child_number_visits ** (1 / temp))
-
+    policy = ((root.child_number_visits) ** (1 / temp)) / sum(root.child_number_visits ** (1 / temp))
+    return policy
 
 def MCTS_self_play(connectnet, num_games, start_idx, cpu, args, iteration):
     logger.info("[CPU: %d]: Starting MCTS self-play..." % cpu)
@@ -191,7 +192,7 @@ def MCTS_self_play(connectnet, num_games, start_idx, cpu, args, iteration):
             board_state = copy.deepcopy(ed.encode_board(current_board))
             root = UCT_search(current_board, 50, connectnet, t)
             policy = get_policy(root, t); print("[CPU: %d]: Game %d POLICY:\n " % (cpu, idxx), policy)
-            actions = [[0,0],[0,1], [0,2], [1,0], [1,1], [1,2], [2,0], [2,1], [2,2]]
+            actions = [i for i in range(9)]
             current_board = do_decode_n_move_pieces(current_board, actions[np.random.choice(np.array([0,1,2,3,4,5,6,7,8]), p = policy)])
             dataset.append([board_state, policy])
             print("[Iteration: %d CPU: %d]: Game %d CURRENT BOARD:\n" % (iteration, cpu, idxx), current_board.board,current_board.player); print(" ")
