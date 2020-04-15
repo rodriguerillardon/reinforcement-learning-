@@ -1,8 +1,8 @@
 import numpy as np
 from morpion import Morpion_board
 
-def encode_board(board):
-    board_sate = board.current_board
+def encode_board(board, two_d=False):
+    board_sate = board.board
     encoded = np.zeros([3,3,3]).astype(int)
     encoder_dict = {'O':0, 'X':1}
     for row in range(3):
@@ -11,6 +11,15 @@ def encode_board(board):
                 encoded[row, col, encoder_dict[board_sate[row, col]]] = 1
     if board.player == 1:
         encoded[:,:,2] = 1
+    if two_d:
+        encoded=np.zeros([3,3,1])
+        encoder_dict = {'O': 1, 'X': -1}
+        for row in range(3):
+            for col in range(3):
+                if board_sate[row, col] == 'X':
+                    encoded[row, col, 1] = -1
+                if board_sate[row,col] == 'O':
+                    encoded[row, col, 1] = 1
     return encoded
 
 def decode_board(encoded):

@@ -31,7 +31,7 @@ def play_game(net):
     checkmate = False
     dataset = []
     value = 0;
-    t = 0.1;
+    t = 1;
     moves_count = 0
     while checkmate == False and current_board.actions() != []:
         if moves_count <= 5:
@@ -45,7 +45,7 @@ def play_game(net):
         if current_board.player == 0:
             if white != None:
                 print("AI is thinking........")
-                root = UCT_search(current_board, 777, white, t)
+                root = UCT_search(current_board, 30, white, t)
                 policy = get_policy(root, t)
                 current_board = do_decode_n_move_pieces(current_board, \
                                                         int(np.random.choice(np.array(range(9)), \
@@ -59,7 +59,7 @@ def play_game(net):
         elif current_board.player == 1:
             if black != None:
                 print("AI is thinking.............")
-                root = UCT_search(current_board, 333, black, t)
+                root = UCT_search(current_board, 30, black, t)
                 policy = get_policy(root, t)
                 current_board = do_decode_n_move_pieces(current_board, \
                                                         int(np.random.choice(np.array(range(9)), \

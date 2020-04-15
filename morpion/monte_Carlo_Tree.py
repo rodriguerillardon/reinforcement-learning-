@@ -144,7 +144,7 @@ def UCT_search(game_state, num_reads, net, temp):
     root = UCT_node(game_state, move=None, parent=DummyNode())
     for i in range(num_reads):
         leaf = root.select_leaf()
-        encoded_s = ed.encode_board(leaf.game); encoded_s = encoded_s.transpose(2,0,1)
+        encoded_s = ed.encode_board(leaf.game, two_d=True)
         encoded_s = torch.from_numpy(encoded_s).float()
         child_priors, value_estimate = net(encoded_s)
         child_priors = child_priors.detach().cpu().numpy().reshape(-1); value_estimate = value_estimate.item()
