@@ -6,16 +6,7 @@ from keras.models import *
 from keras.layers import *
 from keras.optimizers import *
 import os
-from morpion.morpion import Morpion_board
 
-"""
-NeuralNet for the game of TicTacToe.
-
-Author: Evgeny Tyurin, github.com/evg-tyurin
-Date: Jan 5, 2018.
-
-Based on the OthelloNNet by SourKream and Surag Nair.
-"""
 class TicTacToeNNet():
     def __init__(self):
         # game params
